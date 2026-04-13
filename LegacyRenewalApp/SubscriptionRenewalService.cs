@@ -7,6 +7,8 @@ using LegacyRenewalApp.SegmentDiscount;
 namespace LegacyRenewalApp
 {
     
+    //record to wrap result of 
+    public record PaymentFeeResult(decimal Fee, string Note);
     
     public class SubscriptionRenewalService
     {
@@ -95,31 +97,11 @@ namespace LegacyRenewalApp
             //premium support 
             var supportFee = CalculateSupportFee(includePremiumSupport, planCode, ref notes);
             
-            decimal paymentFee = 0m;
-            if (normalizedPaymentMethod == "CARD")
-            {
-                paymentFee = (subtotalAfterDiscount + supportFee) * 0.02m;
-                notes += "card payment fee; ";
-            }
-            else if (normalizedPaymentMethod == "BANK_TRANSFER")
-            {
-                paymentFee = (subtotalAfterDiscount + supportFee) * 0.01m;
-                notes += "bank transfer fee; ";
-            }
-            else if (normalizedPaymentMethod == "PAYPAL")
-            {
-                paymentFee = (subtotalAfterDiscount + supportFee) * 0.035m;
-                notes += "paypal fee; ";
-            }
-            else if (normalizedPaymentMethod == "INVOICE")
-            {
-                paymentFee = 0m;
-                notes += "invoice payment; ";
-            }
-            else
-            {
-                throw new ArgumentException("Unsupported payment method");
-            }
+            //payment method
+            var paymentResult = CalculatePaymentFee(normalizedPaymentMethod, subtotalAfterDiscount, supportFee);
+
+            decimal paymentFee = paymentResult.Fee;
+            notes += paymentResult.Note;
 
             decimal taxRate = 0.20m;
             if (customer.Country == "Poland")
@@ -190,5 +172,39 @@ namespace LegacyRenewalApp
 
             return fee;
         }
+        
+        private PaymentFeeResult CalculatePaymentFee(
+            string normalizedPaymentMethod,
+            decimal subtotalAfterDiscount,
+            decimal supportFee)
+        {
+            var baseAmount = subtotalAfterDiscount + supportFee;
+
+            return normalizedPaymentMethod switch
+            {
+                "CARD" => new PaymentFeeResult(
+                    baseAmount * 0.02m,
+                    "card payment fee; "
+                ),
+
+                "BANK_TRANSFER" => new PaymentFeeResult(
+                    baseAmount * 0.01m,
+                    "bank transfer fee; "
+                ),
+
+                "PAYPAL" => new PaymentFeeResult(
+                    baseAmount * 0.035m,
+                    "paypal fee; "
+                ),
+
+                "INVOICE" => new PaymentFeeResult(
+                    0m,
+                    "invoice payment; "
+                ),
+
+                _ => throw new ArgumentException("Unsupported payment method")
+            };
+        }
+        
     }
 }

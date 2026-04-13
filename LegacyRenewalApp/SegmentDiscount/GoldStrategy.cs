@@ -1,19 +1,19 @@
-﻿namespace LegacyRenewalApp.Discount;
+﻿namespace LegacyRenewalApp.SegmentDiscount;
 
-public class SilverStrategy: IDiscountStrategy
+public class GoldStrategy: IDiscountStrategy
 {
     public bool Strategy(Customer customer, SubscriptionPlan subscriptionPlan)
     {
-        return customer.Segment == "Silver";
+        return customer.Segment == "Gold";
     }
 
     public decimal ApplyDiscount(decimal baseAmount)
     {
-        return baseAmount * 0.05m;
+        return baseAmount * 0.10m;
     }
 
     public string AddToNode()
     {
-        return "silver discount; ";
+        return "gold discount; ";
     }
 }

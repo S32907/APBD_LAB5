@@ -1,4 +1,4 @@
-﻿namespace LegacyRenewalApp.Discount;
+﻿namespace LegacyRenewalApp.SegmentDiscount;
 
 public class PlatinumStrategy: IDiscountStrategy
 {

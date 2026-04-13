@@ -1,5 +1,6 @@
 using System;
-using LegacyRenewalApp.Discount;
+using LegacyRenewalApp.LoyaltyDiscount;
+using LegacyRenewalApp.SegmentDiscount;
 
 namespace LegacyRenewalApp
 {
@@ -41,23 +42,20 @@ namespace LegacyRenewalApp
             decimal baseAmount = (plan.MonthlyPricePerSeat * seatCount * 12m) + plan.SetupFee;
             decimal discountAmount = 0m;
             string notes = string.Empty;
-
+            
+            //segment discount:
             var producer = new StrategyProducer();
             var strategy = producer.GetStrategy(customer, plan);
             discountAmount += strategy.ApplyDiscount(baseAmount);
             notes += strategy.AddToNode();
-
-            if (customer.YearsWithCompany >= 5)
-            {
-                discountAmount += baseAmount * 0.07m;
-                notes += "long-term loyalty discount; ";
-            }
-            else if (customer.YearsWithCompany >= 2)
-            {
-                discountAmount += baseAmount * 0.03m;
-                notes += "basic loyalty discount; ";
-            }
-
+            
+            
+            //loyalty discount:
+            var loyaltyProducer = new LoyaltyStrategyProducer();
+            var loyaltyStrategy = loyaltyProducer.getLoyaltyDiscountStrategy(customer);
+            discountAmount += loyaltyStrategy.Apply(baseAmount);
+            notes += loyaltyStrategy.addNote();
+            
             if (seatCount >= 50)
             {
                 discountAmount += baseAmount * 0.12m;

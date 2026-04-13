@@ -6,8 +6,19 @@ using LegacyRenewalApp.SegmentDiscount;
 
 namespace LegacyRenewalApp
 {
+    
+    
     public class SubscriptionRenewalService
     {
+        
+        //premium support
+        private static readonly Dictionary<string, decimal> SupportFees = new()
+        {
+            { "START", 250m },
+            { "PRO", 400m },
+            { "ENTERPRISE", 700m }
+        };
+        
         public RenewalInvoice CreateRenewalInvoice(
             int customerId,
             string planCode,
@@ -82,22 +93,7 @@ namespace LegacyRenewalApp
             
             
             //premium support 
-            Dictionary<string, decimal> SupportFees = new()
-            {
-                { "START", 250m },
-                { "PRO", 400m },
-                { "ENTERPRISE", 700m }
-            };
-            
-            decimal supportFee = 0m;
-            if (includePremiumSupport)
-            {
-                if (SupportFees.TryGetValue(planCode, out var fee))
-                {
-                    supportFee = fee;
-                }
-                notes += "premium support included; ";
-            }
+            var supportFee = CalculateSupportFee(includePremiumSupport, planCode, ref notes);
             
             decimal paymentFee = 0m;
             if (normalizedPaymentMethod == "CARD")
@@ -183,6 +179,16 @@ namespace LegacyRenewalApp
             }
 
             return invoice;
+        }
+        private decimal CalculateSupportFee(bool includePremiumSupport, string planCode, ref string notes)
+        {
+            if (!includePremiumSupport)
+                return 0m;
+
+            var fee = SupportFees.GetValueOrDefault(planCode, 0m);
+            notes += "premium support included; ";
+
+            return fee;
         }
     }
 }

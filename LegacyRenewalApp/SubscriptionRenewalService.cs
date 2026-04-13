@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using LegacyRenewalApp.LoyaltyDiscount;
 using LegacyRenewalApp.SeatDiscount;
 using LegacyRenewalApp.SegmentDiscount;
@@ -78,26 +79,26 @@ namespace LegacyRenewalApp
                 subtotalAfterDiscount = 300m;
                 notes += "minimum discounted subtotal applied; ";
             }
-
+            
+            
+            //premium support 
+            Dictionary<string, decimal> SupportFees = new()
+            {
+                { "START", 250m },
+                { "PRO", 400m },
+                { "ENTERPRISE", 700m }
+            };
+            
             decimal supportFee = 0m;
             if (includePremiumSupport)
             {
-                if (normalizedPlanCode == "START")
+                if (SupportFees.TryGetValue(planCode, out var fee))
                 {
-                    supportFee = 250m;
+                    supportFee = fee;
                 }
-                else if (normalizedPlanCode == "PRO")
-                {
-                    supportFee = 400m;
-                }
-                else if (normalizedPlanCode == "ENTERPRISE")
-                {
-                    supportFee = 700m;
-                }
-
                 notes += "premium support included; ";
             }
-
+            
             decimal paymentFee = 0m;
             if (normalizedPaymentMethod == "CARD")
             {

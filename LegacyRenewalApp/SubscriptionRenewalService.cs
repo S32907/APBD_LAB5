@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using LegacyRenewalApp.LoyaltyDiscount;
 using LegacyRenewalApp.SeatDiscount;
 using LegacyRenewalApp.SegmentDiscount;
+using LegacyRenewalApp.Tax;
 
 namespace LegacyRenewalApp
 {
@@ -102,24 +103,10 @@ namespace LegacyRenewalApp
 
             decimal paymentFee = paymentResult.Fee;
             notes += paymentResult.Note;
-
-            decimal taxRate = 0.20m;
-            if (customer.Country == "Poland")
-            {
-                taxRate = 0.23m;
-            }
-            else if (customer.Country == "Germany")
-            {
-                taxRate = 0.19m;
-            }
-            else if (customer.Country == "Czech Republic")
-            {
-                taxRate = 0.21m;
-            }
-            else if (customer.Country == "Norway")
-            {
-                taxRate = 0.25m;
-            }
+            
+            //tax
+            var taxRateProvider = new TaxRateProvider();
+            decimal taxRate = taxRateProvider.GetTaxRate(customer.Country);
 
             decimal taxBase = subtotalAfterDiscount + supportFee + paymentFee;
             decimal taxAmount = taxBase * taxRate;

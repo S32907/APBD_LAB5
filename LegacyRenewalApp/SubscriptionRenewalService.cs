@@ -1,5 +1,6 @@
 using System;
 using LegacyRenewalApp.LoyaltyDiscount;
+using LegacyRenewalApp.SeatDiscount;
 using LegacyRenewalApp.SegmentDiscount;
 
 namespace LegacyRenewalApp
@@ -56,21 +57,13 @@ namespace LegacyRenewalApp
             discountAmount += loyaltyStrategy.Apply(baseAmount);
             notes += loyaltyStrategy.addNote();
             
-            if (seatCount >= 50)
-            {
-                discountAmount += baseAmount * 0.12m;
-                notes += "large team discount; ";
-            }
-            else if (seatCount >= 20)
-            {
-                discountAmount += baseAmount * 0.08m;
-                notes += "medium team discount; ";
-            }
-            else if (seatCount >= 10)
-            {
-                discountAmount += baseAmount * 0.04m;
-                notes += "small team discount; ";
-            }
+            
+            //seat discount: 
+            var seatProducer = new SeatStrategyProducer();
+            var seatStrategy = seatProducer.GetSeatStrategy(seatCount);
+            discountAmount += seatStrategy.Apply(baseAmount);
+            notes += seatStrategy.addNote();
+            
 
             if (useLoyaltyPoints && customer.LoyaltyPoints > 0)
             {

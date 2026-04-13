@@ -4,7 +4,7 @@ namespace LegacyRenewalApp.LoyaltyDiscount;
 
 public class LoyaltyStrategyProducer
 {
-    private List<ILoyaltyDiscountStrategy> strategies = new List<ILoyaltyDiscountStrategy>()
+    private readonly List<ILoyaltyDiscountStrategy> _strategies = new List<ILoyaltyDiscountStrategy>()
     {
         new BasicLoyaltyDiscount(),
         new LongTermLoyaltyDiscount(),
@@ -13,7 +13,7 @@ public class LoyaltyStrategyProducer
 
     public ILoyaltyDiscountStrategy getLoyaltyDiscountStrategy(Customer customer)
     {
-        foreach (var strategy in strategies)
+        foreach (var strategy in _strategies)
         {
             if (strategy.IsApplicable(customer))
             {

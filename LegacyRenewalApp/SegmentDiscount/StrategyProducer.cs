@@ -4,7 +4,7 @@ namespace LegacyRenewalApp.SegmentDiscount;
 
 public class StrategyProducer
 {
-    private List<IDiscountStrategy> strategies = new List<IDiscountStrategy>()
+    private readonly List<IDiscountStrategy> _strategies = new List<IDiscountStrategy>()
     {
         new SilverStrategy(), 
         new GoldStrategy(),
@@ -14,7 +14,7 @@ public class StrategyProducer
 
     public IDiscountStrategy GetStrategy(Customer customer, SubscriptionPlan subscriptionPlan)
     {
-        foreach (var strategy in strategies)
+        foreach (var strategy in _strategies)
         {
             if (strategy.Strategy(customer, subscriptionPlan))
             {
